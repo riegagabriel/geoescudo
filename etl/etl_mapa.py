@@ -34,6 +34,18 @@ def main():
     ].dropna(subset=["latitud", "longitud"]).copy()
     print(f"  {len(ext):,} denuncias")
 
+    # Excluir puntos de relleno (centroides distritales) — mismo criterio que
+    # etl_proximidad.py: ≥10 denuncias en un punto con >50% direcciones distintas
+    ext["pt"] = (ext["latitud"].round(6).astype(str) + ","
+                 + ext["longitud"].round(6).astype(str))
+    g = ext.groupby("pt").agg(
+        n=("pt", "size"),
+        ndir=("direccion_hecho", lambda s: s.astype(str).nunique()),
+    )
+    sospechosos = set(g[(g["n"] >= 10) & (g["ndir"] > g["n"] * 0.5)].index)
+    ext = ext[~ext["pt"].isin(sospechosos)].copy()
+    print(f"  {len(ext):,} con geolocalización precisa (mapa usa solo estas)")
+
     print("Cargando IIEE activas...")
     p = pd.read_csv(PADRON, low_memory=False)
     dpd = p["departamento_provincia_distrito"].astype(str).str.upper()
@@ -106,7 +118,8 @@ def main():
     title = ("<div style='position:fixed;top:10px;left:60px;z-index:9999;"
              "background:#1E3A8A;color:white;padding:8px 16px;border-radius:8px;"
              "font-family:sans-serif;font-size:14px;'>"
-             "<b>GeoEscudo</b> · Extorsión en entornos escolares · Lima y Callao 2025–26"
+             "<b>GeoEscudo</b> · Extorsión en entornos escolares · Lima y Callao 2025–26 "
+             "· solo denuncias geolocalizadas con precisión"
              "</div>")
     m.get_root().html.add_child(folium.Element(title))
 

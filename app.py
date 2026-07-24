@@ -37,6 +37,7 @@ OUT_DIR = next((p for p in _CANDIDATOS if os.path.isdir(p)), _CANDIDATOS[0])
 XLSX_FILE = os.path.join(OUT_DIR, "dashboard_bienestar_docente.xlsx")
 ENAPRES_JSON = os.path.join(OUT_DIR, "enapres_extorsion.json")
 PROX_JSON = os.path.join(OUT_DIR, "proximidad_verificada.json")
+DIST_JSON = os.path.join(OUT_DIR, "enapres_distrital.json")
 MAPA_HTML = os.path.join(OUT_DIR, "mapa_geoescudo.html")
 ZIP_FILE = os.path.join(OUT_DIR, "mapa_iiee_extorsion.zip")
 
@@ -81,9 +82,13 @@ def load_xlsx(path):
 
 
 @st.cache_data(show_spinner=False)
-def load_enapres(path):
+def _load_json(path, mtime):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def load_enapres(path):
+    return _load_json(path, os.path.getmtime(path))
 
 
 @st.cache_data(show_spinner="Cargando mapa interactivo…")
@@ -102,6 +107,7 @@ def load_map_html(path):
 sheets = load_xlsx(XLSX_FILE) if os.path.exists(XLSX_FILE) else {}
 enapres = load_enapres(ENAPRES_JSON) if os.path.exists(ENAPRES_JSON) else None
 prox = load_enapres(PROX_JSON) if os.path.exists(PROX_JSON) else None
+dist = load_enapres(DIST_JSON) if os.path.exists(DIST_JSON) else None
 
 
 def get(sheet):
@@ -154,8 +160,8 @@ vxd = lc["victimas_por_denuncia"] if lc else None
 
 st.markdown(
     f"""<div class="hero-claim">
-    La extorsión escolar tiene dos caras: <b>la que se denuncia</b> — la mitad de las denuncias
-    en Lima y Callao ocurre a <b>≈100 metros de un colegio</b> — y <b>la que se calla</b>:
+    La extorsión escolar tiene dos caras: <b>la que se denuncia</b> — 4 de cada 10 denuncias
+    geolocalizables en Lima y Callao ocurren a <b>≤100 metros de un colegio</b> — y <b>la que se calla</b>:
     el <b>{cifra_negra_lc if cifra_negra_lc else '—'}%</b> de las víctimas de extorsión no
     denuncia (ENAPRES 2025). GeoEscudo mide ambas — y actúa sobre la causa del silencio:
     <b>la desconfianza</b>.
@@ -166,19 +172,25 @@ st.markdown(
 # KPIs hero
 p100 = prox["umbrales"]["100"] if prox else None
 med = prox["mediana_distancia_m"] if prox else None
+af = prox.get("afectados_100m") if prox else None
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Denuncias de extorsión 2025–26",
           f"{prox['n_denuncias']:,}" if prox else f"{int(kv('Denuncias de extorsión (total)')):,}",
           help="PNP / SIDPOL-DGIS, Lima Metropolitana y Callao, corte 26/05/2026")
 c2.metric("A ≤100 m de un colegio", f"{p100['pct']}%" if p100 else "—",
           delta=f"mediana: {med:.0f} m" if med else None, delta_color="off",
-          help="Distancia de cada denuncia a la IIEE activa más cercana (sjoin_nearest, "
-               "UTM-18S). La mediana indica que la denuncia típica ocurre a ~1 cuadra "
-               "de un colegio.")
-c3.metric("IIEE con extorsión en su entorno", f"{int(kv('IIEE con ≥ 1 denuncia en entorno')):,}",
-          delta=f"{float(kv('% IIEE afectadas'))}% del total", delta_color="inverse")
+          help="Sobre las denuncias con geolocalización precisa "
+               f"({prox['cobertura_geo_pct']}% del total): distancia al local educativo "
+               "activo más cercano (UTM-18S). El resto se georreferencia al centroide "
+               "distrital y se excluye del análisis de proximidad.")
+c3.metric("Locales educativos afectados",
+          f"{af['n_locales']:,}" if af else f"{int(kv('IIEE con ≥ 1 denuncia en entorno')):,}",
+          delta=f"{af['pct_locales']}% del total" if af else None, delta_color="inverse",
+          help="Locales con ≥1 denuncia (geo precisa) a ≤100 m")
 c4.metric("Alumnos y docentes expuestos",
-          f"{int(kv('Alumnos en IIEE afectadas')) + int(kv('Docentes en IIEE afectadas')):,}")
+          f"{af['alumnos_expuestos'] + af['docentes_expuestos']:,}" if af
+          else f"{int(kv('Alumnos en IIEE afectadas')) + int(kv('Docentes en IIEE afectadas')):,}",
+          help="Población (Censo 2025) de los locales educativos afectados")
 c5.metric("Cifra negra (Lima+Callao)",
           f"{cifra_negra_lc}%" if cifra_negra_lc else "—",
           delta="víctimas que no denuncian", delta_color="inverse",
@@ -230,14 +242,19 @@ with tab1:
         ))
         fig.update_yaxes(ticksuffix="%", range=[0, 108])
         st.plotly_chart(fig_base(fig, 300), use_container_width=True)
-        st.info(f"**Lectura:** de las {prox['n_denuncias']:,} denuncias de extorsión, "
-                f"**1 de cada 2 ocurrió a ≤100 m** de un colegio activo y **8 de cada 10 a "
-                f"≤200 m** (menos de dos cuadras). La mediana es {prox['mediana_distancia_m']:.0f} m: "
-                "la denuncia típica de extorsión en Lima y Callao sucede a una cuadra de una "
-                "institución educativa.")
-        st.markdown('<div class="fuente">Distancia de cada denuncia a la IIEE activa más '
-                    'cercana · SIDPOL 26/05/2026 + Padrón Web MINEDU · UTM-18S</div>',
-                    unsafe_allow_html=True)
+        st.info(f"**Lectura:** de las {prox['n_geo_precisa']:,} denuncias con geolocalización "
+                f"precisa, **4 de cada 10 ocurrieron a ≤100 m** de un colegio activo y **8 de "
+                f"cada 10 a ≤200 m** (menos de dos cuadras). La mediana es "
+                f"{prox['mediana_distancia_m']:.0f} m: la denuncia típica de extorsión en Lima "
+                "y Callao sucede a una cuadra de una institución educativa.")
+        st.warning(f"**La otra brecha de datos:** el {100 - prox['cobertura_geo_pct']:.0f}% de "
+                   "las denuncias de extorsión no puede ubicarse con precisión — SIDPOL las "
+                   "georreferencia al centroide del distrito. GeoEscudo trabaja solo con las "
+                   "geolocalizables y visibiliza esta brecha de calidad de información, que "
+                   "también limita la capacidad de focalización de la propia PNP.")
+        st.markdown('<div class="fuente">Distancia de cada denuncia (geo precisa) al local '
+                    'educativo activo más cercano · SIDPOL 26/05/2026 + Padrón Web MINEDU · '
+                    'UTM-18S</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">Evolución mensual de las denuncias</div>',
                 unsafe_allow_html=True)
@@ -282,45 +299,44 @@ with tab1:
 # ② LA CIFRA QUE NO SE VE — ENAPRES 2025
 # ══════════════════════════════════════════════════════════════════════════════
 with tab2:
-    st.markdown('<div class="section-title">La cifra negra: lo que ocurre vs. lo que se denuncia</div>',
+    st.markdown('<div class="section-title">La cifra negra en Lima y Callao: lo que ocurre vs. lo que se denuncia</div>',
                 unsafe_allow_html=True)
     st.markdown(
         "Las denuncias del acto ① son solo la **punta del iceberg**. La ENAPRES 2025 (INEI) "
-        "pregunta directamente a la población si fue víctima de extorsión y si denunció. "
-        "La brecha entre ambas es la **cifra negra** — y su causa principal no es apatía: "
-        "es **miedo y desconfianza**."
+        "pregunta directamente a la población de Lima y Callao si fue víctima de extorsión y "
+        "si denunció. La brecha entre ambas es la **cifra negra** — y su causa principal no es "
+        "apatía: es **miedo y desconfianza**."
     )
 
-    if enapres:
-        doms = [d["dominio"] for d in enapres["dominios"]]
-        sel = st.selectbox("Dominio de análisis (representatividad ENAPRES)", doms,
-                           index=doms.index("Lima + Callao (ciudad)"))
-        d = dom(sel)
-
+    if enapres and lc:
+        d = lc  # dominio Lima + Callao (ciudad)
         m1, m2, m3, m4 = st.columns(4)
         m1.metric("Victimización por extorsión", f"{d['tasa_victimizacion_extorsion_pct']}%",
-                  help="Población urbana 15+ víctima de extorsión en los últimos 12 meses (ponderado)")
+                  help="Población urbana 15+ de Lima y Callao víctima de extorsión en los "
+                       "últimos 12 meses (ponderado, FACTOR_CAP400)")
         m2.metric("Con intento de extorsión", f"{d['tasa_victimizacion_ext_o_intento_pct']}%",
-                  help="Víctimas de extorsión consumada o intento de extorsión")
+                  help="Víctimas de extorsión consumada o intento")
         m3.metric("Víctimas que denunciaron", f"{d['tasa_denuncia_pct']}%")
         m4.metric("Cifra negra", f"{d['cifra_negra_pct']}%",
                   delta="no denuncia", delta_color="inverse")
 
-        if d.get("victimas_por_denuncia"):
-            st.markdown(
-                f"""<div class="hero-claim">Por cada víctima que denuncia, hay
-                <b>≈ {d['victimas_por_denuncia']:.0f} víctimas</b> de extorsión en {sel}.
-                Las {prox['n_denuncias'] if prox else int(kv('Denuncias de extorsión (total)')):,}
-                denuncias registradas son el <b>piso</b>, no la dimensión real del fenómeno.</div>""",
-                unsafe_allow_html=True,
-            )
+        st.markdown(
+            f"""<div class="hero-claim">Por cada víctima que denuncia, hay
+            <b>≈ {d['victimas_por_denuncia']:.0f} víctimas</b> de extorsión en Lima y Callao.
+            Las {prox['n_denuncias'] if prox else int(kv('Denuncias de extorsión (total)')):,}
+            denuncias registradas son el <b>piso</b>: la dimensión real del fenómeno se acercaría
+            a <b>{int(round((prox['n_denuncias'] if prox else 14319) * d['victimas_por_denuncia'] / 1000)):,} mil víctimas</b>.</div>""",
+            unsafe_allow_html=True,
+        )
 
         col_a, col_b = st.columns(2)
 
         with col_a:
-            st.markdown('<div class="section-title">¿Denunció? — comparación entre dominios</div>',
+            st.markdown('<div class="section-title">¿Denunció? — Lima, Callao y referencia nacional</div>',
                         unsafe_allow_html=True)
-            dd = [x for x in enapres["dominios"] if x["tasa_denuncia_pct"] is not None]
+            foco = ["Lima (ciudad)", "Callao (ciudad)", "Nacional urbano"]
+            dd = [x for x in enapres["dominios"] if x["dominio"] in foco]
+            dd = sorted(dd, key=lambda x: foco.index(x["dominio"]))
             names = [x["dominio"] for x in dd]
             den = [x["tasa_denuncia_pct"] for x in dd]
             cn = [x["cifra_negra_pct"] for x in dd]
@@ -333,51 +349,125 @@ with tab2:
                                  textposition="inside"))
             fig.update_layout(barmode="stack")
             fig.update_xaxes(ticksuffix="%", range=[0, 100])
-            st.plotly_chart(fig_base(fig, 320), use_container_width=True)
-            st.markdown('<div class="fuente">ENAPRES 2025, ponderado (FACTOR_CAP400) · '
-                        'víctimas de extorsión consumada</div>', unsafe_allow_html=True)
+            fig.update_yaxes(autorange="reversed")
+            st.plotly_chart(fig_base(fig, 300), use_container_width=True)
+            st.markdown('<div class="fuente">ENAPRES 2025, ponderado · víctimas de extorsión '
+                        'consumada · en el Callao la cifra negra llega a 83.7%</div>',
+                        unsafe_allow_html=True)
 
         with col_b:
-            st.markdown('<div class="section-title">¿Por qué no denuncian? (motivo principal)</div>',
+            st.markdown('<div class="section-title">¿Por qué no denuncian en Lima y Callao?</div>',
                         unsafe_allow_html=True)
-            mot = d.get("motivos_no_denuncia_pct") or dom("Nacional urbano")["motivos_no_denuncia_pct"]
+            mot = d.get("motivos_no_denuncia_pct")
             if mot:
                 mm = pd.Series(mot).sort_values()
-                confianza = {"Miedo a represalias del agresor", "Desconfía de la Policía"}
+                confianza = {"Miedo a represalias del agresor", "Desconfía de la Policía",
+                             "Es una pérdida de tiempo"}
                 colors = [AZUL_OSCURO if k in confianza else AZUL_CLARO for k in mm.index]
                 fig = go.Figure(go.Bar(
                     x=mm.values, y=mm.index, orientation="h", marker_color=colors,
                     text=[f"{v}%" for v in mm.values], textposition="outside",
                 ))
                 fig.update_xaxes(ticksuffix="%")
-                st.plotly_chart(fig_base(fig, 320), use_container_width=True)
+                st.plotly_chart(fig_base(fig, 300), use_container_width=True)
                 pct_conf = sum(v for k, v in mot.items() if k in confianza)
-                st.info(f"**Lectura clave:** el **{pct_conf:.0f}%** de la no-denuncia se explica por "
-                        "**miedo a represalias o desconfianza en la Policía** (barras oscuras). "
-                        "La cifra negra no es apatía: es una respuesta racional a la falta de "
-                        "canales seguros y confiables. **Ahí interviene GeoEscudo (acto ④).**")
+                st.info(f"**Lectura clave:** el **{pct_conf:.0f}%** de la no-denuncia refleja "
+                        "falta de confianza en el sistema (barras oscuras): miedo a represalias, "
+                        "desconfianza en la Policía o la expectativa de que denunciar 'es una "
+                        "pérdida de tiempo'. La cifra negra no es apatía: es una respuesta "
+                        "racional a la falta de canales seguros y confiables. "
+                        "**Ahí interviene GeoEscudo (acto ④).**")
 
-        t1, t2 = st.columns(2)
-        with t1:
-            st.metric("Cree que será víctima de extorsión (próx. 12 meses)",
-                      f"{d['temor_extorsion_pct']}%",
-                      help="ENAPRES 2025 P402_11 — percepción de inseguridad futura")
-        with t2:
-            st.metric("Muestra del dominio",
-                      f"{d['n_respondentes']:,} personas",
-                      delta=f"{d['n_victimas_extorsion']} víctimas de extorsión en muestra",
-                      delta_color="off")
+    # ── Termómetro distrital ──────────────────────────────────────────────────
+    if dist:
+        st.markdown('<div class="section-title">Termómetro distrital: dónde duele más el silencio</div>',
+                    unsafe_allow_html=True)
+        ddf = pd.DataFrame(dist["distritos"])
+
+        col_c, col_d = st.columns(2)
+
+        with col_c:
+            st.markdown("**Víctimas estimadas vs. denuncias registradas** (top 12 distritos)")
+            top = ddf.nlargest(12, "denuncias_extorsion_sidpol").sort_values(
+                "denuncias_extorsion_sidpol")
+            adicionales = top["victimas_estimadas"] - top["denuncias_extorsion_sidpol"]
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                y=top["distrito"], x=top["denuncias_extorsion_sidpol"], orientation="h",
+                name="Denuncias registradas (SIDPOL)", marker_color=AZUL,
+                text=top["denuncias_extorsion_sidpol"], textposition="inside",
+                insidetextanchor="start"))
+            fig.add_trace(go.Bar(
+                y=top["distrito"], x=adicionales, orientation="h",
+                name="Víctimas adicionales estimadas (cifra negra)", marker_color=AMBAR,
+                text=top["victimas_estimadas"], textposition="outside"))
+            fig.update_layout(barmode="stack")
+            st.plotly_chart(fig_base(fig, 430), use_container_width=True)
+            st.markdown('<div class="fuente">Estimación = denuncias × factor de subregistro '
+                        f'({dist["factor_subregistro"]}) del dominio Lima+Callao. Referencial, '
+                        'no medición distrital directa.</div>', unsafe_allow_html=True)
+
+        with col_d:
+            st.markdown("**Se siente inseguro/a en una institución educativa** (% referencial)")
+            ref = ddf[ddf["inseguridad_col_educativa_pct"].notna()].sort_values(
+                "inseguridad_col_educativa_pct").tail(15)
+            fig = go.Figure(go.Bar(
+                x=ref["inseguridad_col_educativa_pct"], y=ref["distrito"], orientation="h",
+                marker_color=AZUL_OSCURO,
+                text=[f"{v}%" for v in ref["inseguridad_col_educativa_pct"]],
+                textposition="outside",
+                customdata=ref["n_modulo_percepcion"],
+                hovertemplate="%{y}: %{x}% (n=%{customdata})<extra></extra>"))
+            fig.update_xaxes(ticksuffix="%")
+            st.plotly_chart(fig_base(fig, 430), use_container_width=True)
+            st.markdown('<div class="fuente">ENAPRES P407_4, excluye a quienes no frecuentan '
+                        'IIEE · solo distritos con n≥80 en el módulo de percepción · '
+                        'Lima+Callao agregado: '
+                        f'{dist["agregado_lima_callao"]["inseguridad_col_educativa_pct"]}%</div>',
+                        unsafe_allow_html=True)
+
+        with st.expander("📋 Tabla distrital completa (indicadores referenciales + n)"):
+            cols_show = {
+                "distrito": "Distrito",
+                "denuncias_extorsion_sidpol": "Denuncias SIDPOL",
+                "victimas_estimadas": "Víctimas estimadas",
+                "inseguridad_col_educativa_pct": "% inseg. en IIEE",
+                "inseguridad_barrio_pct": "% inseg. barrio",
+                "temor_extorsion_pct": "% temor extorsión",
+                "comisaria_mala_pct": "% comisaría mal calificada",
+                "n_modulo_percepcion": "n módulo",
+            }
+            st.dataframe(ddf[list(cols_show)].rename(columns=cols_show),
+                         use_container_width=True, hide_index=True)
 
         with st.expander("⚠️ Nota metodológica (leer antes de citar)"):
             st.markdown(
-                f"- {enapres['nota_metodologica']}\n"
-                "- Los dominios con pocas víctimas en muestra (n < 50) tienen mayor error "
-                "muestral: usar como referencia, no como estimación puntual precisa.\n"
-                "- El **factor de subregistro** del índice IEEE se aplica por dominio "
-                "(ciudad/departamento), nunca distrito a distrito."
+                f"- {dist['nota_metodologica']}\n"
+                f"- {enapres['nota_metodologica'] if enapres else ''}\n"
+                "- Los dominios con pocas víctimas en muestra tienen mayor error muestral: "
+                "usar como referencia, no como estimación puntual precisa."
             )
-    else:
-        st.warning("Ejecuta `GEOESCUDO_APP/etl_enapres.py` para generar los indicadores ENAPRES.")
+
+        with st.expander("🚀 ¿Y fuera de Lima? — la escalabilidad de GeoEscudo"):
+            if enapres:
+                otros = pd.DataFrame([
+                    {"Dominio": x["dominio"],
+                     "Victimización (%)": x["tasa_victimizacion_extorsion_pct"],
+                     "Denunció (%)": x["tasa_denuncia_pct"],
+                     "Cifra negra (%)": x["cifra_negra_pct"]}
+                    for x in enapres["dominios"]
+                    if x["dominio"] in ("La Libertad (depto.)", "Trujillo (ciudad)",
+                                        "Nacional urbano")])
+                st.dataframe(otros, use_container_width=True, hide_index=True)
+                st.markdown(
+                    "**La Libertad** — la otra región del concurso — tiene una victimización "
+                    "por extorsión **3× la nacional** y una cifra negra de **89.8%**: la "
+                    "arquitectura de GeoEscudo (datos SIDPOL + Padrón MINEDU + ENAPRES) es "
+                    "directamente replicable allí."
+                )
+    elif not enapres:
+        st.warning("Ejecuta `GEOESCUDO_APP/etl_enapres.py` y `etl_enapres_distrital.py` "
+                   "para generar los indicadores ENAPRES.")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ③ DÓNDE ACTUAR — exposición escolar / IEEE
@@ -399,41 +489,37 @@ with tab3:
     st.markdown("")
     col_a, col_b = st.columns(2)
     with col_a:
-        st.markdown('<div class="section-title">Distritos con más denuncias ≤100 m de IIEE</div>',
+        st.markdown('<div class="section-title">Distritos con más denuncias ≤100 m de un colegio</div>',
                     unsafe_allow_html=True)
-        df_dn = get("Distritos_IIEE").head(15)
-        if not df_dn.empty:
-            df_dn = df_dn.sort_values("Denuncias ≤100m IIEE")
+        if prox and prox.get("por_distrito"):
+            df_dn = pd.DataFrame(prox["por_distrito"]).head(15).sort_values("denuncias_100m")
             fig = go.Figure(go.Bar(
-                x=df_dn["Denuncias ≤100m IIEE"], y=df_dn["Distrito"], orientation="h",
-                marker_color=AZUL, text=df_dn["Denuncias ≤100m IIEE"], textposition="outside",
+                x=df_dn["denuncias_100m"], y=df_dn["distrito"].str.title(), orientation="h",
+                marker_color=AZUL, text=df_dn["denuncias_100m"], textposition="outside",
+                customdata=df_dn["denuncias_geo_precisa"],
+                hovertemplate="%{y}: %{x} de %{customdata} geolocalizables<extra></extra>",
             ))
             st.plotly_chart(fig_base(fig, 430), use_container_width=True)
-            st.dataframe(get("Distritos_IIEE").head(15), use_container_width=True, hide_index=True)
+            st.markdown('<div class="fuente">Denuncias con geo precisa a ≤100 m del local '
+                        'educativo más cercano, por distrito del hecho</div>',
+                        unsafe_allow_html=True)
     with col_b:
-        st.markdown('<div class="section-title">IIEE más expuestas (entorno ≤100 m)</div>',
+        st.markdown('<div class="section-title">Locales educativos más expuestos (entorno ≤100 m)</div>',
                     unsafe_allow_html=True)
-        df_ti = get("Top_IIEE")
-        if not df_ti.empty:
-            top = df_ti.head(12).sort_values("Denuncias cercanas")
+        if prox and prox.get("top_iiee"):
+            df_ti = pd.DataFrame(prox["top_iiee"])
+            top = df_ti.head(12).sort_values("denuncias_100m")
+            top["etiqueta"] = top["nombre"].str.slice(0, 34) + " · " + top["distrito"].str.title()
             fig = go.Figure(go.Bar(
-                x=top["Denuncias cercanas"], y=top["IIEE"].str.slice(0, 38), orientation="h",
-                marker_color=AZUL, text=top["Denuncias cercanas"], textposition="outside",
+                x=top["denuncias_100m"], y=top["etiqueta"], orientation="h",
+                marker_color=AZUL, text=top["denuncias_100m"], textposition="outside",
             ))
             st.plotly_chart(fig_base(fig, 430), use_container_width=True)
-            st.info("**Lectura:** cada barra son las denuncias registradas a ≤100 m de esa IIEE. "
-                    "Una denuncia puede contar para varias IIEE cercanas: mide exposición "
-                    "geográfica, no atribución. En el piloto, las 3–5 IIEE priorizadas por el "
-                    "IEEE reciben la intervención del acto ④.")
-
-    st.markdown('<div class="section-title">Exposición por tipo de gestión</div>',
-                unsafe_allow_html=True)
-    df_g = get("Por_Gestion")
-    if not df_g.empty:
-        st.dataframe(df_g, use_container_width=True, hide_index=True)
-        st.markdown('<div class="fuente">La exposición se concentra en la gestión pública: '
-                    'un problema de bien público que exige respuesta pública.</div>',
-                    unsafe_allow_html=True)
+            st.info("**Lectura:** cada barra son las denuncias (geo precisa) registradas a "
+                    "≤100 m de ese local educativo. Una denuncia puede contar para varios "
+                    "locales cercanos: mide exposición geográfica, no atribución. En el "
+                    "piloto, las 3–5 IIEE priorizadas por el IEEE reciben la intervención "
+                    "del acto ④.")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ④ CÓMO ACTUAR — comunidad + policía (community policing)
@@ -451,6 +537,32 @@ with tab4:
         "disposición a denunciar** (Peyton et al., 2019, experimento aleatorizado en *PNAS*; "
         "Gill et al., 2014, revisión sistemática)."
     )
+
+    if dist:
+        agg = dist["agregado_lima_callao"]
+        st.markdown('<div class="section-title">La línea de base: así está hoy la relación '
+                    'comunidad–policía en Lima y Callao</div>', unsafe_allow_html=True)
+        b1, b2, b3, b4 = st.columns(4)
+        b1.metric("Califica mal el trabajo de su comisaría",
+                  f"{agg['comisaria_mala_pct']:.0f}%",
+                  help="ENAPRES P414: 'malo' o 'muy malo', excluye 'no sabe'")
+        b2.metric("Califica mal a la PNP en atender prontamente",
+                  f"{agg['pnp_atencion_mala_pct']:.0f}%",
+                  help="ENAPRES P413_1")
+        b3.metric("Califica mal a la PNP en informar a la comunidad",
+                  f"{agg['pnp_informar_mala_pct']:.0f}%",
+                  help="ENAPRES P413_3 — la dimensión que los encuentros escuela-policía "
+                       "atacan directamente")
+        b4.metric("Se siente inseguro/a en una institución educativa",
+                  f"{agg['inseguridad_col_educativa_pct']:.0f}%",
+                  help="ENAPRES P407_4, excluye a quienes no frecuentan IIEE")
+        st.info(
+            f"**Lectura:** esto no es hostilidad hacia la policía — es **demanda insatisfecha "
+            f"de presencia y comunicación**: entre quienes se sienten inseguros en su barrio, el "
+            f"{agg['poca_presencia_policial_pct']:.0f}% cita la *poca presencia policial* como "
+            "razón. Los encuentros escuela–policía convierten esa demanda en contacto positivo, "
+            "y el contacto en confianza (Peyton et al., 2019)."
+        )
 
     st.markdown('<div class="section-title">Encuentros escuela–policía en las IIEE priorizadas</div>',
                 unsafe_allow_html=True)
@@ -516,11 +628,16 @@ with tab5:
     )
     st.markdown('<div class="section-title">Metodología</div>', unsafe_allow_html=True)
     st.markdown(
-        "- **Proximidad espacial:** distancia de cada denuncia a la IIEE activa más cercana "
-        "(`geopandas.sjoin_nearest`, proyección UTM-18S), numerador y denominador en denuncias "
-        "(unidades consistentes). Cifras verificadas: 49.5% ≤100 m, 79.0% ≤200 m, mediana 105 m "
-        "(corte 26/05/2026). Los conteos de IIEE afectadas y población expuesta usan asignación "
-        "a la IIEE más cercana dentro de 100 m (estimación conservadora, sin doble conteo).\n"
+        "- **Calidad de geolocalización (filtro clave):** SIDPOL georreferencia al centroide "
+        "distrital las denuncias cuya dirección no puede geocodificar: 65 puntos concentran "
+        "~77% de las denuncias con direcciones heterogéneas. El análisis de proximidad usa "
+        "solo las 3,316 denuncias con geolocalización precisa (23.2%) y declara esta "
+        "cobertura; los conteos distritales usan el campo `distrito_hecho` (no afectado).\n"
+        "- **Proximidad espacial:** distancia de cada denuncia (geo precisa) al local "
+        "educativo activo más cercano (`geopandas.sjoin_nearest`, UTM-18S), numerador y "
+        "denominador en denuncias. Cifras verificadas: 43.9% ≤100 m, 81.7% ≤200 m, mediana "
+        "111 m (corte 26/05/2026). Locales afectados y población expuesta: buffer de 100 m "
+        "por local (agregando servicios del mismo código de local).\n"
         "- **Cifra negra:** tasas ponderadas con FACTOR_CAP400 (ENAPRES). Extorsión = delito 19; "
         "intento = delito 20. Representatividad por ciudad principal/departamento, no distrital.\n"
         "- **Pipeline reproducible:** descarga automatizada del observatorio ArcGIS del MININTER "

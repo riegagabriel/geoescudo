@@ -24,9 +24,11 @@ import os
 
 import pandas as pd
 
+import glob
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV = os.path.join(BASE, "ENAPRES_2025", "CAP_400_URBANO_4.csv")
-DELITOS = os.path.join(BASE, "MINEDU", "mininter_delitos_total_20260526_135604.csv")
+DELITOS = sorted(glob.glob(os.path.join(BASE, "MINEDU", "mininter_delitos_total_*.csv")))[-1]
 ENAPRES_JSON = os.path.join(BASE, "OUTPUTS_DASHBOARD", "enapres_extorsion.json")
 OUT = os.path.join(BASE, "OUTPUTS_DASHBOARD", "enapres_distrital.json")
 

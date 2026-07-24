@@ -17,8 +17,8 @@
       "distrito": "San Juan De Lurigancho",
       "n_encuestados": 938,
       "n_modulo_percepcion": 289,
-      "denuncias_extorsion_sidpol": 1715,
-      "victimas_estimadas": 6346,
+      "denuncias_extorsion_sidpol": 1810,
+      "victimas_estimadas": 6697,
       "inseguridad_barrio_pct": 57.5,
       "inseguridad_col_educativa_pct": 51.6,
       "temor_extorsion_pct": 35.7,
@@ -31,15 +31,15 @@
       "distrito": "Lima",
       "n_encuestados": 233,
       "n_modulo_percepcion": 68,
-      "denuncias_extorsion_sidpol": 1566,
-      "victimas_estimadas": 5794
+      "denuncias_extorsion_sidpol": 1601,
+      "victimas_estimadas": 5924
     },
     {
       "distrito": "Ate",
       "n_encuestados": 512,
       "n_modulo_percepcion": 162,
-      "denuncias_extorsion_sidpol": 951,
-      "victimas_estimadas": 3519,
+      "denuncias_extorsion_sidpol": 1010,
+      "victimas_estimadas": 3737,
       "inseguridad_barrio_pct": 57.5,
       "inseguridad_col_educativa_pct": 42.8,
       "temor_extorsion_pct": 36.8,
@@ -52,8 +52,8 @@
       "distrito": "Comas",
       "n_encuestados": 393,
       "n_modulo_percepcion": 129,
-      "denuncias_extorsion_sidpol": 832,
-      "victimas_estimadas": 3078,
+      "denuncias_extorsion_sidpol": 873,
+      "victimas_estimadas": 3230,
       "inseguridad_barrio_pct": 56.7,
       "inseguridad_col_educativa_pct": 53.0,
       "temor_extorsion_pct": 35.0,
@@ -66,8 +66,8 @@
       "distrito": "Puente Piedra",
       "n_encuestados": 292,
       "n_modulo_percepcion": 95,
-      "denuncias_extorsion_sidpol": 739,
-      "victimas_estimadas": 2734,
+      "denuncias_extorsion_sidpol": 776,
+      "victimas_estimadas": 2871,
       "inseguridad_barrio_pct": 45.3,
       "inseguridad_col_educativa_pct": 49.5,
       "temor_extorsion_pct": 47.6,
@@ -80,8 +80,8 @@
       "distrito": "Villa El Salvador",
       "n_encuestados": 356,
       "n_modulo_percepcion": 100,
-      "denuncias_extorsion_sidpol": 704,
-      "victimas_estimadas": 2605,
+      "denuncias_extorsion_sidpol": 757,
+      "victimas_estimadas": 2801,
       "inseguridad_barrio_pct": 71.6,
       "inseguridad_col_educativa_pct": 70.9,
       "temor_extorsion_pct": 20.2,
@@ -94,8 +94,8 @@
       "distrito": "Callao",
       "n_encuestados": 1855,
       "n_modulo_percepcion": 578,
-      "denuncias_extorsion_sidpol": 666,
-      "victimas_estimadas": 2464,
+      "denuncias_extorsion_sidpol": 701,
+      "victimas_estimadas": 2594,
       "inseguridad_barrio_pct": 49.6,
       "inseguridad_col_educativa_pct": 43.0,
       "temor_extorsion_pct": 26.6,
@@ -108,8 +108,8 @@
       "distrito": "San Martin De Porres",
       "n_encuestados": 483,
       "n_modulo_percepcion": 154,
-      "denuncias_extorsion_sidpol": 569,
-      "victimas_estimadas": 2105,
+      "denuncias_extorsion_sidpol": 629,
+      "victimas_estimadas": 2327,
       "inseguridad_barrio_pct": 53.1,
       "inseguridad_col_educativa_pct": 53.3,
       "temor_extorsion_pct": 27.3,
@@ -122,8 +122,8 @@
       "distrito": "Chorrillos",
       "n_encuestados": 257,
       "n_modulo_percepcion": 84,
-      "denuncias_extorsion_sidpol": 551,
-      "victimas_estimadas": 2039,
+      "denuncias_extorsion_sidpol": 592,
+      "victimas_estimadas": 2190,
       "inseguridad_barrio_pct": 54.5,
       "inseguridad_col_educativa_pct": 57.3,
       "temor_extorsion_pct": 20.3,
@@ -136,8 +136,8 @@
       "distrito": "Los Olivos",
       "n_encuestados": 270,
       "n_modulo_percepcion": 85,
-      "denuncias_extorsion_sidpol": 522,
-      "victimas_estimadas": 1931,
+      "denuncias_extorsion_sidpol": 558,
+      "victimas_estimadas": 2065,
       "inseguridad_barrio_pct": 54.4,
       "inseguridad_col_educativa_pct": 52.0,
       "temor_extorsion_pct": 43.2,
@@ -150,8 +150,8 @@
       "distrito": "Carabayllo",
       "n_encuestados": 282,
       "n_modulo_percepcion": 110,
-      "denuncias_extorsion_sidpol": 502,
-      "victimas_estimadas": 1857,
+      "denuncias_extorsion_sidpol": 525,
+      "victimas_estimadas": 1942,
       "inseguridad_barrio_pct": 48.7,
       "inseguridad_col_educativa_pct": 58.1,
       "temor_extorsion_pct": 43.2,
@@ -164,15 +164,15 @@
       "distrito": "San Juan De Miraflores",
       "n_encuestados": 248,
       "n_modulo_percepcion": 68,
-      "denuncias_extorsion_sidpol": 418,
-      "victimas_estimadas": 1547
+      "denuncias_extorsion_sidpol": 462,
+      "victimas_estimadas": 1709
     },
     {
       "distrito": "Villa Maria Del Triunfo",
       "n_encuestados": 320,
       "n_modulo_percepcion": 92,
-      "denuncias_extorsion_sidpol": 415,
-      "victimas_estimadas": 1536,
+      "denuncias_extorsion_sidpol": 452,
+      "victimas_estimadas": 1672,
       "inseguridad_barrio_pct": 63.4,
       "inseguridad_col_educativa_pct": 72.0,
       "temor_extorsion_pct": 25.5,
@@ -185,8 +185,8 @@
       "distrito": "Lurigancho",
       "n_encuestados": 314,
       "n_modulo_percepcion": 99,
-      "denuncias_extorsion_sidpol": 294,
-      "victimas_estimadas": 1088,
+      "denuncias_extorsion_sidpol": 314,
+      "victimas_estimadas": 1162,
       "inseguridad_barrio_pct": 38.0,
       "inseguridad_col_educativa_pct": 18.2,
       "temor_extorsion_pct": 21.7,
@@ -199,15 +199,15 @@
       "distrito": "Santiago De Surco",
       "n_encuestados": 259,
       "n_modulo_percepcion": 69,
-      "denuncias_extorsion_sidpol": 294,
-      "victimas_estimadas": 1088
+      "denuncias_extorsion_sidpol": 313,
+      "victimas_estimadas": 1158
     },
     {
       "distrito": "Ventanilla",
       "n_encuestados": 1726,
       "n_modulo_percepcion": 598,
-      "denuncias_extorsion_sidpol": 285,
-      "victimas_estimadas": 1054,
+      "denuncias_extorsion_sidpol": 302,
+      "victimas_estimadas": 1117,
       "inseguridad_barrio_pct": 47.9,
       "inseguridad_col_educativa_pct": 47.6,
       "temor_extorsion_pct": 36.5,
@@ -220,85 +220,85 @@
       "distrito": "Pachacamac",
       "n_encuestados": 148,
       "n_modulo_percepcion": 51,
-      "denuncias_extorsion_sidpol": 272,
-      "victimas_estimadas": 1006
+      "denuncias_extorsion_sidpol": 283,
+      "victimas_estimadas": 1047
     },
     {
       "distrito": "Independencia",
       "n_encuestados": 201,
       "n_modulo_percepcion": 61,
-      "denuncias_extorsion_sidpol": 264,
-      "victimas_estimadas": 977
+      "denuncias_extorsion_sidpol": 281,
+      "victimas_estimadas": 1040
     },
     {
       "distrito": "La Victoria",
       "n_encuestados": 123,
       "n_modulo_percepcion": 48,
-      "denuncias_extorsion_sidpol": 264,
-      "victimas_estimadas": 977
-    },
-    {
-      "distrito": "Santa Anita",
-      "n_encuestados": 108,
-      "n_modulo_percepcion": 37,
-      "denuncias_extorsion_sidpol": 251,
-      "victimas_estimadas": 929
+      "denuncias_extorsion_sidpol": 279,
+      "victimas_estimadas": 1032
     },
     {
       "distrito": "Rimac",
       "n_encuestados": 141,
       "n_modulo_percepcion": 43,
-      "denuncias_extorsion_sidpol": 232,
-      "victimas_estimadas": 858
+      "denuncias_extorsion_sidpol": 271,
+      "victimas_estimadas": 1003
+    },
+    {
+      "distrito": "Santa Anita",
+      "n_encuestados": 108,
+      "n_modulo_percepcion": 37,
+      "denuncias_extorsion_sidpol": 265,
+      "victimas_estimadas": 980
     },
     {
       "distrito": "La Molina",
       "n_encuestados": 71,
       "n_modulo_percepcion": 20,
-      "denuncias_extorsion_sidpol": 190,
-      "victimas_estimadas": 703
+      "denuncias_extorsion_sidpol": 198,
+      "victimas_estimadas": 733
     },
     {
       "distrito": "Lurin",
       "n_encuestados": 99,
       "n_modulo_percepcion": 31,
-      "denuncias_extorsion_sidpol": 175,
-      "victimas_estimadas": 648
+      "denuncias_extorsion_sidpol": 195,
+      "victimas_estimadas": 722
     },
     {
       "distrito": "El Agustino",
       "n_encuestados": 156,
       "n_modulo_percepcion": 44,
-      "denuncias_extorsion_sidpol": 158,
-      "victimas_estimadas": 585
+      "denuncias_extorsion_sidpol": 170,
+      "victimas_estimadas": 629
     },
     {
       "distrito": "Ancon",
       "n_encuestados": 60,
       "n_modulo_percepcion": 25,
-      "denuncias_extorsion_sidpol": 118,
-      "victimas_estimadas": 437
+      "denuncias_extorsion_sidpol": 128,
+      "victimas_estimadas": 474
     },
     {
       "distrito": "San Miguel",
       "n_encuestados": 118,
       "n_modulo_percepcion": 36,
-      "denuncias_extorsion_sidpol": 106,
-      "victimas_estimadas": 392
+      "denuncias_extorsion_sidpol": 114,
+      "victimas_estimadas": 422
     },
     {
       "distrito": "San Borja",
       "n_encuestados": 66,
       "n_modulo_percepcion": 21,
-      "denuncias_extorsion_sidpol": 105,
-      "victimas_estimadas": 388
+      "denuncias_extorsion_sidpol": 108,
+      "victimas_estimadas": 400
     },
     {
       "distrito": "Bellavista",
       "n_encuestados": 304,
       "n_modulo_percepcion": 87,
-      "denuncias_extorsion_sidpol": 100,
-      "victimas_estimadas": 370,
+      "denuncias_extorsion_sidpol": 105,
+      "victimas_estimadas": 388,
       "inseguridad_barrio_pct": 27.3,
       "inseguridad_col_educativa_pct": 44.3,
       "temor_extorsion_pct": 26.6,
@@ -311,15 +311,15 @@
       "distrito": "Miraflores",
       "n_encuestados": 67,
       "n_modulo_percepcion": 28,
-      "denuncias_extorsion_sidpol": 97,
-      "victimas_estimadas": 359
+      "denuncias_extorsion_sidpol": 102,
+      "victimas_estimadas": 377
     },
     {
       "distrito": "La Perla",
       "n_encuestados": 268,
       "n_modulo_percepcion": 80,
-      "denuncias_extorsion_sidpol": 89,
-      "victimas_estimadas": 329,
+      "denuncias_extorsion_sidpol": 96,
+      "victimas_estimadas": 355,
       "inseguridad_barrio_pct": 54.3,
       "inseguridad_col_educativa_pct": 50.0,
       "temor_extorsion_pct": 21.0,
@@ -332,55 +332,62 @@
       "distrito": "Chaclacayo",
       "n_encuestados": 26,
       "n_modulo_percepcion": 6,
-      "denuncias_extorsion_sidpol": 84,
-      "victimas_estimadas": 311
-    },
-    {
-      "distrito": "Jesus Maria",
-      "n_encuestados": 92,
-      "n_modulo_percepcion": 27,
-      "denuncias_extorsion_sidpol": 80,
-      "victimas_estimadas": 296
+      "denuncias_extorsion_sidpol": 93,
+      "victimas_estimadas": 344
     },
     {
       "distrito": "San Luis",
       "n_encuestados": 16,
       "n_modulo_percepcion": 3,
-      "denuncias_extorsion_sidpol": 80,
-      "victimas_estimadas": 296
+      "denuncias_extorsion_sidpol": 90,
+      "victimas_estimadas": 333
     },
     {
-      "distrito": "Surquillo",
-      "n_encuestados": 90,
-      "n_modulo_percepcion": 29,
-      "denuncias_extorsion_sidpol": 76,
-      "victimas_estimadas": 281
-    },
-    {
-      "distrito": "San Isidro",
-      "n_encuestados": 33,
-      "n_modulo_percepcion": 12,
-      "denuncias_extorsion_sidpol": 75,
-      "victimas_estimadas": 278
+      "distrito": "Jesus Maria",
+      "n_encuestados": 92,
+      "n_modulo_percepcion": 27,
+      "denuncias_extorsion_sidpol": 83,
+      "victimas_estimadas": 307
     },
     {
       "distrito": "Breña",
       "n_encuestados": 83,
       "n_modulo_percepcion": 28,
-      "denuncias_extorsion_sidpol": 73,
-      "victimas_estimadas": 270
+      "denuncias_extorsion_sidpol": 81,
+      "victimas_estimadas": 300
     },
     {
-      "distrito": "Cieneguilla",
-      "n_encuestados": 11,
-      "n_modulo_percepcion": 4,
-      "denuncias_extorsion_sidpol": 63,
-      "victimas_estimadas": 233
+      "distrito": "Surquillo",
+      "n_encuestados": 90,
+      "n_modulo_percepcion": 29,
+      "denuncias_extorsion_sidpol": 80,
+      "victimas_estimadas": 296
+    },
+    {
+      "distrito": "San Isidro",
+      "n_encuestados": 33,
+      "n_modulo_percepcion": 12,
+      "denuncias_extorsion_sidpol": 79,
+      "victimas_estimadas": 292
     },
     {
       "distrito": "Pueblo Libre",
       "n_encuestados": 47,
       "n_modulo_percepcion": 16,
+      "denuncias_extorsion_sidpol": 67,
+      "victimas_estimadas": 248
+    },
+    {
+      "distrito": "Cieneguilla",
+      "n_encuestados": 11,
+      "n_modulo_percepcion": 4,
+      "denuncias_extorsion_sidpol": 65,
+      "victimas_estimadas": 240
+    },
+    {
+      "distrito": "Magdalena Del Mar",
+      "n_encuestados": 30,
+      "n_modulo_percepcion": 12,
       "denuncias_extorsion_sidpol": 61,
       "victimas_estimadas": 226
     },
@@ -388,15 +395,8 @@
       "distrito": "Lince",
       "n_encuestados": 43,
       "n_modulo_percepcion": 14,
-      "denuncias_extorsion_sidpol": 53,
-      "victimas_estimadas": 196
-    },
-    {
-      "distrito": "Magdalena Del Mar",
-      "n_encuestados": 30,
-      "n_modulo_percepcion": 12,
-      "denuncias_extorsion_sidpol": 51,
-      "victimas_estimadas": 189
+      "denuncias_extorsion_sidpol": 54,
+      "victimas_estimadas": 200
     },
     {
       "distrito": "Barranco",
@@ -406,6 +406,13 @@
       "victimas_estimadas": 141
     },
     {
+      "distrito": "Carmen De La Legua Reynoso",
+      "n_encuestados": 152,
+      "n_modulo_percepcion": 56,
+      "denuncias_extorsion_sidpol": 35,
+      "victimas_estimadas": 130
+    },
+    {
       "distrito": "Santa Rosa",
       "n_encuestados": 36,
       "n_modulo_percepcion": 14,
@@ -413,18 +420,11 @@
       "victimas_estimadas": 130
     },
     {
-      "distrito": "Carmen De La Legua Reynoso",
-      "n_encuestados": 152,
-      "n_modulo_percepcion": 56,
-      "denuncias_extorsion_sidpol": 30,
-      "victimas_estimadas": 111
-    },
-    {
       "distrito": "Pucusana",
       "n_encuestados": 42,
       "n_modulo_percepcion": 15,
-      "denuncias_extorsion_sidpol": 17,
-      "victimas_estimadas": 63
+      "denuncias_extorsion_sidpol": 18,
+      "victimas_estimadas": 67
     },
     {
       "distrito": "Punta Hermosa",
@@ -437,22 +437,22 @@
       "distrito": "San Bartolo",
       "n_encuestados": 10,
       "n_modulo_percepcion": 6,
-      "denuncias_extorsion_sidpol": 13,
-      "victimas_estimadas": 48
+      "denuncias_extorsion_sidpol": 15,
+      "victimas_estimadas": 56
     },
     {
       "distrito": "La Punta",
       "n_encuestados": 27,
       "n_modulo_percepcion": 12,
-      "denuncias_extorsion_sidpol": 8,
-      "victimas_estimadas": 30
+      "denuncias_extorsion_sidpol": 9,
+      "victimas_estimadas": 33
     },
     {
       "distrito": "Mi Peru",
       "n_encuestados": 239,
       "n_modulo_percepcion": 78,
-      "denuncias_extorsion_sidpol": 7,
-      "victimas_estimadas": 26
+      "denuncias_extorsion_sidpol": 8,
+      "victimas_estimadas": 30
     }
   ]
 }

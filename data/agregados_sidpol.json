@@ -1,0 +1,131 @@
+{
+  "fuente": "PNP/SIDPOL-DGIS · corte 31/05/2026",
+  "corte": "31/05/2026",
+  "archivo_origen": "mininter_delitos_total_20260724_163626.csv",
+  "ambito": "Lima Metropolitana + Callao",
+  "total_denuncias": 15213,
+  "total_extorsion": 13755,
+  "total_extorsion_agravada": 1458,
+  "linea_tiempo": [
+    {
+      "periodo": "2025-01",
+      "extorsion": 869,
+      "extorsion_agravada": 114,
+      "total": 983
+    },
+    {
+      "periodo": "2025-02",
+      "extorsion": 872,
+      "extorsion_agravada": 84,
+      "total": 956
+    },
+    {
+      "periodo": "2025-03",
+      "extorsion": 1042,
+      "extorsion_agravada": 103,
+      "total": 1145
+    },
+    {
+      "periodo": "2025-04",
+      "extorsion": 1097,
+      "extorsion_agravada": 111,
+      "total": 1208
+    },
+    {
+      "periodo": "2025-05",
+      "extorsion": 1003,
+      "extorsion_agravada": 98,
+      "total": 1101
+    },
+    {
+      "periodo": "2025-06",
+      "extorsion": 934,
+      "extorsion_agravada": 94,
+      "total": 1028
+    },
+    {
+      "periodo": "2025-07",
+      "extorsion": 881,
+      "extorsion_agravada": 111,
+      "total": 992
+    },
+    {
+      "periodo": "2025-08",
+      "extorsion": 971,
+      "extorsion_agravada": 101,
+      "total": 1072
+    },
+    {
+      "periodo": "2025-09",
+      "extorsion": 981,
+      "extorsion_agravada": 93,
+      "total": 1074
+    },
+    {
+      "periodo": "2025-10",
+      "extorsion": 1047,
+      "extorsion_agravada": 110,
+      "total": 1157
+    },
+    {
+      "periodo": "2025-11",
+      "extorsion": 771,
+      "extorsion_agravada": 80,
+      "total": 851
+    },
+    {
+      "periodo": "2025-12",
+      "extorsion": 599,
+      "extorsion_agravada": 72,
+      "total": 671
+    },
+    {
+      "periodo": "2026-01",
+      "extorsion": 549,
+      "extorsion_agravada": 66,
+      "total": 615
+    },
+    {
+      "periodo": "2026-02",
+      "extorsion": 514,
+      "extorsion_agravada": 54,
+      "total": 568
+    },
+    {
+      "periodo": "2026-03",
+      "extorsion": 130,
+      "extorsion_agravada": 20,
+      "total": 150
+    },
+    {
+      "periodo": "2026-04",
+      "extorsion": 760,
+      "extorsion_agravada": 79,
+      "total": 839
+    },
+    {
+      "periodo": "2026-05",
+      "extorsion": 735,
+      "extorsion_agravada": 68,
+      "total": 803
+    }
+  ],
+  "turnos": [
+    {
+      "turno": "tarde",
+      "total": 5319
+    },
+    {
+      "turno": "noche",
+      "total": 4271
+    },
+    {
+      "turno": "mañana",
+      "total": 3316
+    },
+    {
+      "turno": "madrugada",
+      "total": 2307
+    }
+  ]
+}

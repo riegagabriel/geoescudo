@@ -18,12 +18,14 @@ Salida: OUTPUTS_DASHBOARD/proximidad_verificada.json
 import json
 import os
 
+import glob
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DELITOS = os.path.join(BASE, "MINEDU", "mininter_delitos_total_20260526_135604.csv")
+DELITOS = sorted(glob.glob(os.path.join(BASE, "MINEDU", "mininter_delitos_total_*.csv")))[-1]
 PADRON = os.path.join(BASE, "MINEDU", "padron_iiee_peru_completo_todos_estados.csv")
 OUT = os.path.join(BASE, "OUTPUTS_DASHBOARD", "proximidad_verificada.json")
 
@@ -31,7 +33,7 @@ UMBRALES = [50, 100, 150, 200, 300, 500]
 
 
 def main():
-    print("Cargando denuncias SIDPOL (corte 26/05/2026)...")
+    print(f"Cargando denuncias SIDPOL ({os.path.basename(DELITOS)})...")
     dt = pd.read_csv(DELITOS, low_memory=False)
     dt["subtipo_hecho"] = dt["subtipo_hecho"].astype(str)
     ext = dt[
@@ -122,8 +124,14 @@ def main():
     top_iiee = afect.nlargest(30, "denuncias_100m")[
         ["nombre", "distrito", "tipo_gestion", "alumnos", "docentes", "denuncias_100m"]]
 
+    # Fecha de corte: máxima fecha de registro presente en la extracción
+    corte = pd.to_datetime(dt["fecha_hora_registro_hecho"], unit="ms", errors="coerce").max()
+    corte_str = corte.strftime("%d/%m/%Y") if pd.notna(corte) else "s/f"
+
     out = {
-        "fuente": "PNP/SIDPOL-DGIS corte 26/05/2026 + MINEDU Padrón Web (IIEE activas)",
+        "fuente": f"PNP/SIDPOL-DGIS corte {corte_str} + MINEDU Padrón Web (IIEE activas)",
+        "corte": corte_str,
+        "archivo_origen": os.path.basename(DELITOS),
         "ambito": "Lima Metropolitana + Callao",
         "metodo": ("Distancia de cada denuncia de extorsión al local educativo activo más "
                    "cercano; sjoin_nearest en UTM-18S. Numerador y denominador en denuncias. "

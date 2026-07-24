@@ -9,6 +9,7 @@ Capas:
 
 Salida: OUTPUTS_DASHBOARD/mapa_geoescudo.html  (objetivo: < 8 MB)
 """
+import glob
 import os
 
 import folium
@@ -17,7 +18,7 @@ import pandas as pd
 from folium.plugins import FastMarkerCluster, HeatMap
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DELITOS = os.path.join(BASE, "MINEDU", "mininter_delitos_total_20260526_135604.csv")
+DELITOS = sorted(glob.glob(os.path.join(BASE, "MINEDU", "mininter_delitos_total_*.csv")))[-1]
 PADRON = os.path.join(BASE, "MINEDU", "padron_iiee_peru_completo_todos_estados.csv")
 OUT = os.path.join(BASE, "OUTPUTS_DASHBOARD", "mapa_geoescudo.html")
 

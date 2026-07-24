@@ -1,0 +1,7 @@
+# Datos crudos — no se versionan (tamaño y licencias); ver README
+*.csv
+raw/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store

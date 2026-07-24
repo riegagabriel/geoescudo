@@ -1,0 +1,35 @@
+{
+  "fuente": "PNP/SIDPOL-DGIS corte 26/05/2026 + MINEDU Padrón Web (IIEE activas)",
+  "ambito": "Lima Metropolitana + Callao",
+  "metodo": "Distancia de cada denuncia de extorsión a la IIEE activa más cercana; sjoin_nearest en UTM-18S. Denominador y numerador en DENUNCIAS (sin deduplicar ubicaciones), unidades consistentes.",
+  "n_denuncias": 14319,
+  "n_servicios_educativos_activos": 33710,
+  "n_locales_educativos": 18273,
+  "mediana_distancia_m": 104.6,
+  "umbrales": {
+    "50": {
+      "n_denuncias": 1590,
+      "pct": 11.1
+    },
+    "100": {
+      "n_denuncias": 7081,
+      "pct": 49.5
+    },
+    "150": {
+      "n_denuncias": 8642,
+      "pct": 60.4
+    },
+    "200": {
+      "n_denuncias": 11318,
+      "pct": 79.0
+    },
+    "300": {
+      "n_denuncias": 12923,
+      "pct": 90.3
+    },
+    "500": {
+      "n_denuncias": 13965,
+      "pct": 97.5
+    }
+  }
+}

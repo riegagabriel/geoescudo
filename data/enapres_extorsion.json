@@ -1,0 +1,126 @@
+{
+  "fuente": "INEI — ENAPRES 2025, Cap. 400 Seguridad Ciudadana (urbano, 15+ años)",
+  "ponderacion": "FACTOR_CAP400",
+  "nota_metodologica": "Extorsión = delito 19; intento de extorsión = delito 20. Representatividad: nacional urbano, departamentos y ciudades principales; NO representativa a nivel distrital. Tasas ponderadas con factor de expansión. La tasa de denuncia se calcula sobre víctimas de extorsión consumada; los motivos de no denuncia agregan extorsión consumada e intento.",
+  "dominios": [
+    {
+      "dominio": "Nacional urbano",
+      "n_respondentes": 60214,
+      "n_victimas_extorsion": 201,
+      "n_victimas_intento": 456,
+      "tasa_victimizacion_extorsion_pct": 0.4,
+      "tasa_victimizacion_ext_o_intento_pct": 1.12,
+      "tasa_denuncia_pct": 24.3,
+      "cifra_negra_pct": 75.7,
+      "victimas_por_denuncia": 4.1,
+      "temor_extorsion_pct": 28.4,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 19.8,
+        "Es una pérdida de tiempo": 33.2,
+        "Desconfía de la Policía": 22.6,
+        "No se consumó el hecho": 2.6,
+        "Delito de poca importancia": 10.7,
+        "Desconoce al delincuente": 6.1,
+        "Otro": 5.0
+      }
+    },
+    {
+      "dominio": "Lima + Callao (ciudad)",
+      "n_respondentes": 9822,
+      "n_victimas_extorsion": 47,
+      "n_victimas_intento": 84,
+      "tasa_victimizacion_extorsion_pct": 0.48,
+      "tasa_victimizacion_ext_o_intento_pct": 1.09,
+      "tasa_denuncia_pct": 26.7,
+      "cifra_negra_pct": 73.3,
+      "victimas_por_denuncia": 3.7,
+      "temor_extorsion_pct": 30.0,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 19.5,
+        "Es una pérdida de tiempo": 38.9,
+        "Desconfía de la Policía": 16.4,
+        "Delito de poca importancia": 11.9,
+        "Desconoce al delincuente": 7.0,
+        "Otro": 6.2
+      }
+    },
+    {
+      "dominio": "Lima (ciudad)",
+      "n_respondentes": 5873,
+      "n_victimas_extorsion": 30,
+      "n_victimas_intento": 44,
+      "tasa_victimizacion_extorsion_pct": 0.5,
+      "tasa_victimizacion_ext_o_intento_pct": 1.1,
+      "tasa_denuncia_pct": 27.5,
+      "cifra_negra_pct": 72.5,
+      "victimas_por_denuncia": 3.6,
+      "temor_extorsion_pct": 30.0,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 18.6,
+        "Es una pérdida de tiempo": 39.2,
+        "Desconfía de la Policía": 16.4,
+        "Delito de poca importancia": 12.1,
+        "Desconoce al delincuente": 7.0,
+        "Otro": 6.7
+      }
+    },
+    {
+      "dominio": "Callao (ciudad)",
+      "n_respondentes": 3949,
+      "n_victimas_extorsion": 17,
+      "n_victimas_intento": 40,
+      "tasa_victimizacion_extorsion_pct": 0.34,
+      "tasa_victimizacion_ext_o_intento_pct": 1.03,
+      "tasa_denuncia_pct": 16.3,
+      "cifra_negra_pct": 83.7,
+      "victimas_por_denuncia": 6.1,
+      "temor_extorsion_pct": 30.1,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 27.2,
+        "Es una pérdida de tiempo": 36.3,
+        "Desconfía de la Policía": 16.8,
+        "Delito de poca importancia": 10.9,
+        "Desconoce al delincuente": 6.6,
+        "Otro": 2.3
+      }
+    },
+    {
+      "dominio": "La Libertad (depto.)",
+      "n_respondentes": 2643,
+      "n_victimas_extorsion": 34,
+      "n_victimas_intento": 68,
+      "tasa_victimizacion_extorsion_pct": 1.29,
+      "tasa_victimizacion_ext_o_intento_pct": 3.53,
+      "tasa_denuncia_pct": 10.2,
+      "cifra_negra_pct": 89.8,
+      "victimas_por_denuncia": 9.8,
+      "temor_extorsion_pct": 35.1,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 33.9,
+        "Es una pérdida de tiempo": 27.1,
+        "Desconfía de la Policía": 31.2,
+        "Delito de poca importancia": 6.6,
+        "Desconoce al delincuente": 0.8,
+        "Otro": 0.3
+      }
+    },
+    {
+      "dominio": "Trujillo (ciudad)",
+      "n_respondentes": 1630,
+      "n_victimas_extorsion": 15,
+      "n_victimas_intento": 46,
+      "tasa_victimizacion_extorsion_pct": 0.72,
+      "tasa_victimizacion_ext_o_intento_pct": 3.43,
+      "tasa_denuncia_pct": 12.4,
+      "cifra_negra_pct": 87.6,
+      "victimas_por_denuncia": 8.1,
+      "temor_extorsion_pct": 40.4,
+      "motivos_no_denuncia_pct": {
+        "Miedo a represalias del agresor": 29.3,
+        "Es una pérdida de tiempo": 30.9,
+        "Desconfía de la Policía": 35.2,
+        "Delito de poca importancia": 4.6
+      }
+    }
+  ]
+}

@@ -13,6 +13,7 @@ import os
 
 import pandas as pd
 import plotly.graph_objects as go
+import pydeck as pdk
 import streamlit as st
 from streamlit.components.v1 import html as st_html
 
@@ -36,6 +37,7 @@ ENAPRES_JSON = os.path.join(OUT_DIR, "enapres_extorsion.json")
 PROX_JSON = os.path.join(OUT_DIR, "proximidad_verificada.json")
 DIST_JSON = os.path.join(OUT_DIR, "enapres_distrital.json")
 AGR_JSON = os.path.join(OUT_DIR, "agregados_sidpol.json")
+IBC_JSON = os.path.join(OUT_DIR, "ibc_distrital.json")
 MAPA_HTML = os.path.join(OUT_DIR, "mapa_geoescudo.html")
 
 PLOTLY_CFG = {"displayModeBar": False}
@@ -89,6 +91,7 @@ enapres = load_json(ENAPRES_JSON)
 prox = load_json(PROX_JSON)
 dist = load_json(DIST_JSON)
 agr = load_json(AGR_JSON)
+ibc = load_json(IBC_JSON)
 
 if not (enapres and prox and agr):
     st.error("Faltan datos procesados. Ejecuta los ETL de `GEOESCUDO_APP/` "
@@ -121,6 +124,91 @@ def fig_base(fig, height=340):
     fig.update_xaxes(gridcolor=GRID, zerolinecolor=GRID)
     fig.update_yaxes(gridcolor=GRID, zerolinecolor=GRID)
     return fig
+
+
+# ── Mapa 3D del Índice de Brecha de Confianza (IBC) ───────────────────────────
+IBC_OFFSET = 0.0035  # separación lon entre barra de denuncias y de desconfianza (~350 m)
+IBC_ELEV_SCALE = 280
+
+
+def build_ibc_deck(ibc_data):
+    df = pd.DataFrame(ibc_data["distritos"])
+    df["brecha_fmt"] = df["brecha"].map(lambda v: f"{v:+.0f}")
+
+    df_d = df.assign(lon=df["lon"] - IBC_OFFSET, valor=df["pct_denuncias"],
+                     serie="Denuncias (percentil)")
+    df_c = df.assign(lon=df["lon"] + IBC_OFFSET, valor=df["pct_desconfianza"],
+                     serie="Desconfianza (percentil)")
+    cols = ["lon", "lat", "valor", "distrito", "brecha_fmt", "serie"]
+
+    layer_d = pdk.Layer(
+        "ColumnLayer", id="denuncias", data=df_d[cols],
+        get_position=["lon", "lat"], get_elevation="valor",
+        elevation_scale=IBC_ELEV_SCALE, radius=280,
+        get_fill_color=[37, 99, 235, 210], pickable=True, auto_highlight=True,
+    )
+    layer_c = pdk.Layer(
+        "ColumnLayer", id="desconfianza", data=df_c[cols],
+        get_position=["lon", "lat"], get_elevation="valor",
+        elevation_scale=IBC_ELEV_SCALE, radius=280,
+        get_fill_color=[217, 119, 6, 210], pickable=True, auto_highlight=True,
+    )
+    view = pdk.ViewState(longitude=-77.017, latitude=-12.05, zoom=9.6, pitch=35, bearing=0)
+    tooltip = {"html": "<b>{distrito}</b><br/>{serie}: {valor}<br/>Brecha: {brecha_fmt}",
+               "style": {"backgroundColor": "#1E3A8A", "color": "white", "fontSize": "12px"}}
+    return pdk.Deck(layers=[layer_d, layer_c], initial_view_state=view,
+                    map_provider="carto", map_style="light", tooltip=tooltip)
+
+
+IBC_LEGEND_HTML = """
+<div style="display:flex; gap:18px; align-items:center; font-size:0.8rem; color:#4B5768;
+            margin:6px 0 2px 0;">
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;
+        background:#2563EB;margin-right:5px;vertical-align:middle;"></span>Denuncias registradas (percentil entre distritos)</span>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;
+        background:#D97706;margin-right:5px;vertical-align:middle;"></span>Señal de desconfianza (percentil entre distritos)</span>
+</div>
+<div style="font-size:0.78rem; color:#7A8698; margin-bottom:8px;">
+  Barra ámbar más alta que la azul = el distrito desconfía proporcionalmente más de lo que denuncia (brecha positiva).
+</div>
+"""
+
+
+def render_ibc_panel(distrito_row):
+    r = distrito_row
+    if r["brecha"] >= 20:
+        etiqueta, color = "Brecha alta — silencio por encima de lo esperado", AMBAR
+    elif r["brecha"] <= -20:
+        etiqueta, color = "Denuncia proporcionalmente alta", "#166534"
+    else:
+        etiqueta, color = "Cercano al equilibrio", INK_MUTED
+    st.markdown(f"### {r['distrito']}")
+    st.markdown(f'<span style="background:{color}22; color:{color}; padding:2px 10px; '
+                f'border-radius:99px; font-size:0.78rem; font-weight:700;">{etiqueta}</span>',
+                unsafe_allow_html=True)
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Denuncias registradas", f"{r['denuncias_total']:,}")
+    m2.metric("Víctimas estimadas", f"{r['victimas_estimadas']:,}",
+              help="Denuncias × factor de subregistro Lima+Callao (referencial, no distrital)")
+    m3.metric("Índice de brecha", f"{r['brecha']:+.0f}")
+
+    fig = go.Figure(go.Bar(
+        x=["Denuncias", "Desconfianza"], y=[r["pct_denuncias"], r["pct_desconfianza"]],
+        marker_color=[AZUL, AMBAR], text=[f"{r['pct_denuncias']:.0f}", f"{r['pct_desconfianza']:.0f}"],
+        textposition="outside",
+    ))
+    fig.update_yaxes(range=[0, 108], title="Percentil entre distritos")
+    st.plotly_chart(fig_base(fig, 220), use_container_width=True, config=PLOTLY_CFG)
+
+    st.markdown("**Exposición escolar (IEEE) en el distrito**")
+    e1, e2 = st.columns(2)
+    e1.metric("Locales afectados (≤100 m)", f"{r['locales_afectados']:,}")
+    e2.metric("Alumnos y docentes expuestos",
+              f"{r['alumnos_expuestos'] + r['docentes_expuestos']:,}")
+    if r["top_iiee"]:
+        st.caption("IIEE más expuestas del distrito:")
+        for t in r["top_iiee"]:
+            st.markdown(f"- {t['nombre']} — {t['denuncias_100m']} denuncia(s) ≤100 m")
 
 
 # ── Header ────────────────────────────────────────────────────────────────────
@@ -180,12 +268,52 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ① EL RIESGO VISIBLE — lo que registra el Estado
 # ══════════════════════════════════════════════════════════════════════════════
 with tab1:
-    st.markdown('<div class="section-title">Mapa: denuncias de extorsión e instituciones educativas</div>',
+    st.markdown('<div class="section-title">Mapa: brecha de confianza y exposición escolar</div>',
                 unsafe_allow_html=True)
-    st.markdown("Heatmap y clusters de denuncias (SIDPOL) + IIEE con ≥1 denuncia a ≤100 m (MINEDU). "
-                "Usa el panel de capas para activar o desactivar cada capa.")
+    modo = st.radio(
+        "Vista del mapa", ["Brecha de confianza (IBC)", "Exposición al riesgo (IEEE)"],
+        horizontal=True, label_visibility="collapsed",
+    )
 
-    if os.path.exists(MAPA_HTML):
+    if modo.startswith("Brecha") and ibc:
+        st.markdown("Dos barras por distrito: cuánto se denuncia frente a cuánta desconfianza "
+                    "se expresa. Donde la barra ámbar supera a la azul, hay más silencio del "
+                    "que las cifras oficiales muestran. **Haz clic en una barra** para ver el "
+                    "detalle del distrito.")
+        col_map, col_panel = st.columns([2.1, 1])
+        with col_map:
+            deck = build_ibc_deck(ibc)
+            event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object",
+                                    height=560)
+            st.markdown(IBC_LEGEND_HTML, unsafe_allow_html=True)
+            st.markdown(f'<div class="fuente">Solo distritos con muestra ENAPRES suficiente '
+                        f'(n≥{ibc["min_n_distrital"]} en el módulo de percepción) · '
+                        'Generado con GEOESCUDO_APP/etl_ibc.py</div>', unsafe_allow_html=True)
+
+        distritos_ibc = ibc["distritos"]
+        nombres = [d["distrito"] for d in distritos_ibc]
+        sel_click = None
+        if event and event.selection and event.selection.objects:
+            for _, items in event.selection.objects.items():
+                if items:
+                    sel_click = items[0].get("distrito")
+                    break
+        if sel_click and sel_click in nombres:
+            st.session_state["ibc_sel"] = sel_click
+        elif "ibc_sel" not in st.session_state:
+            st.session_state["ibc_sel"] = nombres[0]
+
+        with col_panel:
+            elegido = st.selectbox("O elige un distrito", nombres, key="ibc_sel")
+            row = next(d for d in distritos_ibc if d["distrito"] == elegido)
+            render_ibc_panel(row)
+
+        with st.expander("⚠️ Nota metodológica del IBC"):
+            st.markdown(ibc["nota_metodologica"])
+
+    elif os.path.exists(MAPA_HTML):
+        st.markdown("Heatmap y clusters de denuncias (SIDPOL) + IIEE con ≥1 denuncia a ≤100 m "
+                    "(MINEDU). Usa el panel de capas para activar o desactivar cada capa.")
         with open(MAPA_HTML, encoding="utf-8") as fh:
             st_html(fh.read(), height=650, scrolling=False)
         st.markdown('<div class="fuente">Vista pública agregada (privacy by design): los círculos '

@@ -124,6 +124,20 @@ def main():
     top_iiee = afect.nlargest(30, "denuncias_100m")[
         ["nombre", "distrito", "tipo_gestion", "alumnos", "docentes", "denuncias_100m"]]
 
+    # Población expuesta y locales afectados, agregados por distrito (para el
+    # panel del IBC): SOLO locales con >=1 denuncia en su buffer de 100 m.
+    afect_dist = (
+        afect.assign(distrito_norm=afect["distrito"].astype(str).str.upper().str.strip())
+        .groupby("distrito_norm")
+        .agg(locales_afectados=("denuncias_100m", "size"),
+             alumnos_expuestos=("alumnos", "sum"),
+             docentes_expuestos=("docentes", "sum"))
+        .reset_index()
+        .rename(columns={"distrito_norm": "distrito"})
+    )
+    for c in ("locales_afectados", "alumnos_expuestos", "docentes_expuestos"):
+        afect_dist[c] = afect_dist[c].astype(int)
+
     # Fecha de corte: máxima fecha de registro presente en la extracción
     corte = pd.to_datetime(dt["fecha_hora_registro_hecho"], unit="ms", errors="coerce").max()
     corte_str = corte.strftime("%d/%m/%Y") if pd.notna(corte) else "s/f"
@@ -165,6 +179,7 @@ def main():
         "por_distrito": por_dist.rename(columns={"distrito_hecho": "distrito"})
                                 .to_dict(orient="records"),
         "top_iiee": top_iiee.to_dict(orient="records"),
+        "expuestos_por_distrito": afect_dist.to_dict(orient="records"),
     }
 
     with open(OUT, "w", encoding="utf-8") as f:

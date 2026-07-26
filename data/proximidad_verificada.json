@@ -587,5 +587,277 @@
       "docentes": 0,
       "denuncias_100m": 6
     }
+  ],
+  "expuestos_por_distrito": [
+    {
+      "distrito": "ANCÓN",
+      "locales_afectados": 5,
+      "alumnos_expuestos": 2005,
+      "docentes_expuestos": 97
+    },
+    {
+      "distrito": "ATE",
+      "locales_afectados": 257,
+      "alumnos_expuestos": 25642,
+      "docentes_expuestos": 1508
+    },
+    {
+      "distrito": "BARRANCO",
+      "locales_afectados": 5,
+      "alumnos_expuestos": 3567,
+      "docentes_expuestos": 249
+    },
+    {
+      "distrito": "BELLAVISTA",
+      "locales_afectados": 126,
+      "alumnos_expuestos": 4594,
+      "docentes_expuestos": 315
+    },
+    {
+      "distrito": "BREÑA",
+      "locales_afectados": 25,
+      "alumnos_expuestos": 5185,
+      "docentes_expuestos": 318
+    },
+    {
+      "distrito": "CALLAO",
+      "locales_afectados": 121,
+      "alumnos_expuestos": 24727,
+      "docentes_expuestos": 1429
+    },
+    {
+      "distrito": "CARABAYLLO",
+      "locales_afectados": 35,
+      "alumnos_expuestos": 3897,
+      "docentes_expuestos": 227
+    },
+    {
+      "distrito": "CARMEN DE LA LEGUA REYNOSO",
+      "locales_afectados": 20,
+      "alumnos_expuestos": 4666,
+      "docentes_expuestos": 264
+    },
+    {
+      "distrito": "CHACLACAYO",
+      "locales_afectados": 6,
+      "alumnos_expuestos": 972,
+      "docentes_expuestos": 76
+    },
+    {
+      "distrito": "CHORRILLOS",
+      "locales_afectados": 70,
+      "alumnos_expuestos": 10911,
+      "docentes_expuestos": 691
+    },
+    {
+      "distrito": "COMAS",
+      "locales_afectados": 130,
+      "alumnos_expuestos": 24928,
+      "docentes_expuestos": 1423
+    },
+    {
+      "distrito": "EL AGUSTINO",
+      "locales_afectados": 36,
+      "alumnos_expuestos": 11250,
+      "docentes_expuestos": 535
+    },
+    {
+      "distrito": "INDEPENDENCIA",
+      "locales_afectados": 132,
+      "alumnos_expuestos": 21270,
+      "docentes_expuestos": 1090
+    },
+    {
+      "distrito": "JESÚS MARÍA",
+      "locales_afectados": 18,
+      "alumnos_expuestos": 2786,
+      "docentes_expuestos": 257
+    },
+    {
+      "distrito": "LA MOLINA",
+      "locales_afectados": 16,
+      "alumnos_expuestos": 4338,
+      "docentes_expuestos": 435
+    },
+    {
+      "distrito": "LA PERLA",
+      "locales_afectados": 17,
+      "alumnos_expuestos": 3339,
+      "docentes_expuestos": 277
+    },
+    {
+      "distrito": "LA VICTORIA",
+      "locales_afectados": 28,
+      "alumnos_expuestos": 6051,
+      "docentes_expuestos": 457
+    },
+    {
+      "distrito": "LIMA",
+      "locales_afectados": 1918,
+      "alumnos_expuestos": 46398,
+      "docentes_expuestos": 2252
+    },
+    {
+      "distrito": "LINCE",
+      "locales_afectados": 9,
+      "alumnos_expuestos": 451,
+      "docentes_expuestos": 34
+    },
+    {
+      "distrito": "LOS OLIVOS",
+      "locales_afectados": 372,
+      "alumnos_expuestos": 15424,
+      "docentes_expuestos": 932
+    },
+    {
+      "distrito": "LURIGANCHO",
+      "locales_afectados": 79,
+      "alumnos_expuestos": 7500,
+      "docentes_expuestos": 400
+    },
+    {
+      "distrito": "LURIN",
+      "locales_afectados": 45,
+      "alumnos_expuestos": 6870,
+      "docentes_expuestos": 376
+    },
+    {
+      "distrito": "MAGDALENA DEL MAR",
+      "locales_afectados": 17,
+      "alumnos_expuestos": 3868,
+      "docentes_expuestos": 286
+    },
+    {
+      "distrito": "MI PERÚ",
+      "locales_afectados": 8,
+      "alumnos_expuestos": 2022,
+      "docentes_expuestos": 122
+    },
+    {
+      "distrito": "MIRAFLORES",
+      "locales_afectados": 250,
+      "alumnos_expuestos": 1629,
+      "docentes_expuestos": 171
+    },
+    {
+      "distrito": "PACHACAMAC",
+      "locales_afectados": 28,
+      "alumnos_expuestos": 7225,
+      "docentes_expuestos": 378
+    },
+    {
+      "distrito": "PUCUSANA",
+      "locales_afectados": 3,
+      "alumnos_expuestos": 995,
+      "docentes_expuestos": 51
+    },
+    {
+      "distrito": "PUEBLO LIBRE",
+      "locales_afectados": 55,
+      "alumnos_expuestos": 824,
+      "docentes_expuestos": 48
+    },
+    {
+      "distrito": "PUENTE PIEDRA",
+      "locales_afectados": 195,
+      "alumnos_expuestos": 18722,
+      "docentes_expuestos": 998
+    },
+    {
+      "distrito": "PUNTA HERMOSA",
+      "locales_afectados": 1,
+      "alumnos_expuestos": 273,
+      "docentes_expuestos": 11
+    },
+    {
+      "distrito": "RÍMAC",
+      "locales_afectados": 48,
+      "alumnos_expuestos": 6921,
+      "docentes_expuestos": 447
+    },
+    {
+      "distrito": "SAN BARTOLO",
+      "locales_afectados": 1,
+      "alumnos_expuestos": 0,
+      "docentes_expuestos": 0
+    },
+    {
+      "distrito": "SAN BORJA",
+      "locales_afectados": 9,
+      "alumnos_expuestos": 1119,
+      "docentes_expuestos": 87
+    },
+    {
+      "distrito": "SAN ISIDRO",
+      "locales_afectados": 8,
+      "alumnos_expuestos": 2589,
+      "docentes_expuestos": 168
+    },
+    {
+      "distrito": "SAN JUAN DE LURIGANCHO",
+      "locales_afectados": 541,
+      "alumnos_expuestos": 84020,
+      "docentes_expuestos": 3943
+    },
+    {
+      "distrito": "SAN JUAN DE MIRAFLORES",
+      "locales_afectados": 97,
+      "alumnos_expuestos": 13387,
+      "docentes_expuestos": 834
+    },
+    {
+      "distrito": "SAN LUIS",
+      "locales_afectados": 28,
+      "alumnos_expuestos": 2066,
+      "docentes_expuestos": 101
+    },
+    {
+      "distrito": "SAN MARTÍN DE PORRES",
+      "locales_afectados": 141,
+      "alumnos_expuestos": 19564,
+      "docentes_expuestos": 1275
+    },
+    {
+      "distrito": "SAN MIGUEL",
+      "locales_afectados": 28,
+      "alumnos_expuestos": 3811,
+      "docentes_expuestos": 293
+    },
+    {
+      "distrito": "SANTA ANITA",
+      "locales_afectados": 31,
+      "alumnos_expuestos": 10868,
+      "docentes_expuestos": 716
+    },
+    {
+      "distrito": "SANTIAGO DE SURCO",
+      "locales_afectados": 47,
+      "alumnos_expuestos": 18952,
+      "docentes_expuestos": 1220
+    },
+    {
+      "distrito": "SURQUILLO",
+      "locales_afectados": 14,
+      "alumnos_expuestos": 1442,
+      "docentes_expuestos": 106
+    },
+    {
+      "distrito": "VENTANILLA",
+      "locales_afectados": 50,
+      "alumnos_expuestos": 9307,
+      "docentes_expuestos": 545
+    },
+    {
+      "distrito": "VILLA EL SALVADOR",
+      "locales_afectados": 285,
+      "alumnos_expuestos": 22229,
+      "docentes_expuestos": 1289
+    },
+    {
+      "distrito": "VILLA MARÍA DEL TRIUNFO",
+      "locales_afectados": 69,
+      "alumnos_expuestos": 12921,
+      "docentes_expuestos": 702
+    }
   ]
 }

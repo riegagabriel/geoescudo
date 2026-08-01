@@ -7,6 +7,7 @@ textColor = "#1F2937"
 [server]
 headless = true
 enableXsrfProtection = true
+enableStaticServing = true
 
 [browser]
 gatherUsageStats = false

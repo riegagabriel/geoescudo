@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoEscudo — Sala de Situación</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#05070B; --panel:rgba(13,18,28,.94); --panel-solid:#0D1220;
+    --line:rgba(88,120,168,.25); --ink:#E7ECF5; --ink-2:#8FA3C8; --ink-3:#5B6E8C;
+    --blue:#3B82F6; --blue-dim:#1E3A8A; --amber:#F0A24B; --amber-dim:#B45309;
+    --good:#34D399; --glow-blue:rgba(59,130,246,.45); --glow-amber:rgba(240,162,75,.45);
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); overflow:hidden; }
+  body { font-family:"Public Sans",system-ui,sans-serif; color:var(--ink); }
+  #app { position:relative; width:100%; height:100vh; }
+  #map { position:absolute; inset:0; }
+
+  /* Vignette + scanline ambience */
+  #app::before {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);
+  }
+  #scanline {
+    position:absolute; inset:0; pointer-events:none; z-index:6; opacity:.05;
+    background:repeating-linear-gradient(0deg, #fff 0px, transparent 1px, transparent 3px);
+  }
+
+  /* HUD top bar */
+  #hud {
+    position:absolute; top:14px; left:14px; right:14px; z-index:10;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:12px; pointer-events:none;
+  }
+  #hud-title {
+    pointer-events:auto; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:10px 18px; backdrop-filter:blur(6px);
+  }
+  #hud-title .eyebrow {
+    font:600 .64rem/1 "IBM Plex Mono",monospace; letter-spacing:.14em; color:var(--amber);
+    text-transform:uppercase;
+  }
+  #hud-title h1 { margin:.25em 0 0; font-size:1.05rem; font-weight:700; letter-spacing:.01em; }
+  #hud-legend {
+    pointer-events:auto; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:10px 16px; backdrop-filter:blur(6px);
+    font-size:.72rem; color:var(--ink-2); display:flex; flex-direction:column; gap:6px;
+    min-width:230px;
+  }
+  #hud-legend .row { display:flex; align-items:center; gap:8px; }
+  #hud-legend .sw { width:22px; height:8px; border-radius:3px; flex:none; }
+  #hud-legend .grad {
+    width:100%; height:8px; border-radius:3px;
+    background:linear-gradient(90deg, #1E3A8A, #64748B, #F0A24B, #DC2626);
+  }
+  #hud-legend .scale-labels { display:flex; justify-content:space-between; font-size:.62rem; color:var(--ink-3); }
+
+  /* Layer toggle chips */
+  #layers {
+    position:absolute; left:14px; bottom:14px; z-index:10;
+    display:flex; gap:8px; pointer-events:auto;
+  }
+  .chip {
+    font:600 .72rem/1 "IBM Plex Mono",monospace; letter-spacing:.02em;
+    background:var(--panel); border:1px solid var(--line); color:var(--ink-2);
+    padding:8px 14px; border-radius:99px; cursor:pointer; backdrop-filter:blur(6px);
+    transition:all .15s ease; user-select:none;
+  }
+  .chip.active { color:#fff; border-color:var(--blue); box-shadow:0 0 0 1px var(--blue) inset, 0 0 14px var(--glow-blue); }
+  .chip:hover { color:var(--ink); }
+
+  /* Side panel */
+  #panel {
+    position:absolute; top:0; right:0; height:100%; width:360px; z-index:20;
+    background:var(--panel-solid); border-left:1px solid var(--line);
+    box-shadow:-24px 0 48px rgba(0,0,0,.5);
+    transform:translateX(100%); transition:transform .28s cubic-bezier(.2,.8,.2,1);
+    overflow-y:auto; padding:22px 20px 30px;
+  }
+  #panel.open { transform:translateX(0); }
+  #panel .close {
+    position:absolute; top:14px; right:16px; cursor:pointer; color:var(--ink-3);
+    font:600 1.1rem/1 monospace; background:none; border:none;
+  }
+  #panel .close:hover { color:var(--ink); }
+  #panel h2 { margin:0 0 2px; font-size:1.2rem; font-weight:800; padding-right:24px; }
+  #panel .badge {
+    display:inline-block; font:700 .68rem/1 "IBM Plex Mono",monospace; letter-spacing:.04em;
+    padding:4px 10px; border-radius:99px; margin:8px 0 16px;
+  }
+  #panel .metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  #panel .metric {
+    background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:8px;
+    padding:9px 11px;
+  }
+  #panel .metric b {
+    display:block; font:700 1.15rem/1.1 "IBM Plex Mono",monospace; color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  #panel .metric span { font-size:.66rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; }
+  #panel .section-h {
+    font:700 .7rem/1 "IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:.09em;
+    color:var(--ink-2); border-top:1px solid var(--line); padding-top:14px; margin:16px 0 8px;
+  }
+  #panel canvas { max-height:170px; }
+  #panel .iiee-item {
+    font-size:.78rem; color:var(--ink-2); padding:6px 0; border-bottom:1px dashed var(--line);
+  }
+  #panel .iiee-item b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  #panel .note { font-size:.74rem; color:var(--ink-3); line-height:1.5; margin-top:6px; }
+  #panel .empty { color:var(--ink-3); font-size:.85rem; padding-top:60px; text-align:center; }
+
+  .maplibregl-popup-content {
+    background:var(--panel-solid) !important; color:var(--ink) !important;
+    border:1px solid var(--line) !important; border-radius:8px !important;
+    font-family:"Public Sans",sans-serif !important; font-size:.8rem !important;
+  }
+  .maplibregl-popup-tip { border-top-color:var(--panel-solid) !important; }
+  .maplibregl-ctrl-attrib { display:none !important; }
+
+  @media (prefers-reduced-motion: reduce) { #panel { transition:none; } }
+  @media (max-width: 720px) {
+    #panel { width:100%; }
+    #hud-legend { display:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div id="scanline"></div>
+  <div id="hud">
+    <div id="hud-title">
+      <div class="eyebrow">GeoEscudo · Sala de Situación</div>
+      <h1>Extorsión escolar · Lima y Callao</h1>
+    </div>
+    <div id="hud-legend">
+      <div class="row"><span class="sw" style="background:var(--amber)"></span> Densidad de denuncias (mapa de calor)</div>
+      <div class="row"><span class="sw" style="background:var(--blue)"></span> Locales educativos afectados (tamaño = denuncias ≤100 m)</div>
+      <div style="margin-top:2px;">Brecha de confianza por distrito</div>
+      <div class="grad"></div>
+      <div class="scale-labels"><span>denuncia proporcional</span><span>brecha alta</span></div>
+    </div>
+  </div>
+  <div id="layers">
+    <div class="chip active" data-layer="heat">Densidad</div>
+    <div class="chip active" data-layer="iiee">Colegios afectados</div>
+    <div class="chip active" data-layer="distritos">Brecha por distrito</div>
+  </div>
+  <div id="panel">
+    <button class="close" onclick="closePanel()">✕</button>
+    <div id="panel-body"><div class="empty">Haz clic en un distrito del mapa<br>para ver su detalle.</div></div>
+  </div>
+</div>
+
+<script>
+const DISTRITOS = /*__DISTRITOS_GEOJSON__*/;
+const IIEE = /*__IIEE_GEOJSON__*/;
+const HEATMAP = /*__HEATMAP_GEOJSON__*/;
+
+// Basemap RASTER (no vectorial): más robusto en iframes con sandbox/CSP
+// restrictivo, ya que no depende de Web Workers para decodificar tiles.
+const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      'carto-dark': {
+        type: 'raster',
+        tiles: [
+          'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+          'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+          'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+          'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+        ],
+        tileSize: 256,
+        attribution: '© CARTO © OpenStreetMap',
+      },
+    },
+    layers: [{ id: 'carto-dark-layer', type: 'raster', source: 'carto-dark' }],
+  },
+  center: [-77.017, -12.03],
+  zoom: 10.1,
+  pitch: 0,
+  attributionControl: false,
+});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'top-right');
+
+map.on('load', () => {
+  map.addSource('distritos', {type:'geojson', data: DISTRITOS});
+  map.addSource('iiee', {type:'geojson', data: IIEE});
+  map.addSource('heat', {type:'geojson', data: HEATMAP});
+
+  // Distritos: relleno diverging por 'brecha'; gris para sin muestra IBC
+  map.addLayer({
+    id:'distritos-fill', type:'fill', source:'distritos',
+    paint: {
+      'fill-color': [
+        'case', ['==', ['get','tiene_ibc'], true],
+        ['interpolate', ['linear'], ['get','brecha'],
+          -75, '#1E3A8A', -15, '#3B5B8C', 0, '#475569', 15, '#B45309', 60, '#DC2626'],
+        'rgba(90,100,120,0.35)'
+      ],
+      'fill-opacity': 0.55,
+    }
+  });
+  map.addLayer({
+    id:'distritos-line', type:'line', source:'distritos',
+    paint: {'line-color':'rgba(180,200,230,.35)', 'line-width':1}
+  });
+  map.addLayer({
+    id:'distritos-hover', type:'line', source:'distritos',
+    paint: {'line-color':'#ffffff', 'line-width':2},
+    filter: ['==', 'distrito', '']
+  });
+
+  // Heatmap de densidad de denuncias — mono-ámbar (distinto de la paleta
+  // divergente azul/ámbar/rojo de los distritos, para no confundir variables)
+  map.addLayer({
+    id:'heat-layer', type:'heatmap', source:'heat',
+    paint: {
+      'heatmap-weight': 0.5,
+      'heatmap-intensity': 0.55,
+      'heatmap-color': [
+        'interpolate', ['linear'], ['heatmap-density'],
+        0, 'rgba(0,0,0,0)', 0.3, 'rgba(240,162,75,.25)',
+        0.6, 'rgba(240,162,75,.5)', 1, 'rgba(253,224,71,.75)'
+      ],
+      'heatmap-radius': 14,
+      'heatmap-opacity': 0.5,
+    }
+  });
+
+  // Locales educativos afectados
+  map.addLayer({
+    id:'iiee-circles', type:'circle', source:'iiee',
+    paint: {
+      'circle-radius': ['interpolate',['linear'],['get','denuncias_100m'], 1, 4, 10, 12],
+      'circle-color': '#3B82F6',
+      'circle-opacity': 0.85,
+      'circle-stroke-width': 1,
+      'circle-stroke-color': 'rgba(255,255,255,.5)',
+    }
+  });
+
+  map.on('mousemove', 'distritos-fill', (e) => {
+    map.getCanvas().style.cursor = 'pointer';
+    if (e.features.length) {
+      map.setFilter('distritos-hover', ['==', 'distrito', e.features[0].properties.distrito]);
+    }
+  });
+  map.on('mouseleave', 'distritos-fill', () => {
+    map.getCanvas().style.cursor = '';
+    map.setFilter('distritos-hover', ['==', 'distrito', '']);
+  });
+  map.on('click', 'distritos-fill', (e) => {
+    if (e.features.length) openPanel(e.features[0].properties);
+  });
+
+  let popup = null;
+  map.on('mousemove', 'iiee-circles', (e) => {
+    map.getCanvas().style.cursor = 'pointer';
+    const p = e.features[0].properties;
+    if (popup) popup.remove();
+    popup = new maplibregl.Popup({closeButton:false, closeOnClick:false, offset:8})
+      .setLngLat(e.lngLat)
+      .setHTML(`<b>${p.nombre}</b><br>${p.denuncias_100m} denuncia(s) ≤100 m<br>${p.alumnos} alumnos · ${p.docentes} docentes`)
+      .addTo(map);
+  });
+  map.on('mouseleave', 'iiee-circles', () => { map.getCanvas().style.cursor=''; if (popup) popup.remove(); });
+});
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const layer = chip.dataset.layer;
+    const ids = layer === 'heat' ? ['heat-layer']
+              : layer === 'iiee' ? ['iiee-circles']
+              : ['distritos-fill','distritos-line'];
+    const nowActive = !chip.classList.contains('active');
+    chip.classList.toggle('active');
+    ids.forEach(id => map.setLayoutProperty(id, 'visibility', nowActive ? 'visible' : 'none'));
+  });
+});
+
+let chart = null;
+function brechaLabel(b) {
+  if (b >= 20) return {t:'Brecha alta — silencio por encima de lo esperado', c:'#F0A24B'};
+  if (b <= -20) return {t:'Denuncia proporcionalmente alta', c:'#34D399'};
+  return {t:'Cercano al equilibrio', c:'#8FA3C8'};
+}
+
+function openPanel(p) {
+  const panel = document.getElementById('panel');
+  const body = document.getElementById('panel-body');
+  if (!p.tiene_ibc) {
+    body.innerHTML = `
+      <h2>${p.distrito}</h2>
+      <div class="badge" style="background:#5B6E8C33;color:#8FA3C8;">Muestra ENAPRES insuficiente</div>
+      <div class="metrics">
+        <div class="metric"><b>${p.denuncias_total.toLocaleString('es-PE')}</b><span>Denuncias totales</span></div>
+        <div class="metric"><b>${p.denuncias_100m.toLocaleString('es-PE')}</b><span>≤100 m de un colegio</span></div>
+      </div>
+      <p class="note">Este distrito no tiene suficiente muestra en ENAPRES 2025 (n≥80 en el módulo
+      de percepción) para calcular el Índice de Brecha de Confianza. Se muestran solo los datos
+      de denuncias oficiales.</p>`;
+    panel.classList.add('open');
+    return;
+  }
+  const bl = brechaLabel(p.brecha);
+  body.innerHTML = `
+    <h2>${p.distrito}</h2>
+    <div class="badge" style="background:${bl.c}22;color:${bl.c};">${bl.t}</div>
+    <div class="metrics">
+      <div class="metric"><b>${p.denuncias_total.toLocaleString('es-PE')}</b><span>Denuncias registradas</span></div>
+      <div class="metric"><b>${p.victimas_estimadas.toLocaleString('es-PE')}</b><span>Víctimas estimadas*</span></div>
+      <div class="metric"><b>${p.brecha > 0 ? '+' : ''}${p.brecha.toFixed(0)}</b><span>Índice de brecha</span></div>
+      <div class="metric"><b>${p.comisaria_mala_pct.toFixed(0)}%</b><span>Comisaría mal calificada</span></div>
+    </div>
+    <div class="section-h">Denuncia vs. desconfianza (percentil)</div>
+    <canvas id="panel-chart"></canvas>
+    <div class="section-h">Exposición escolar (IEEE)</div>
+    <div class="metrics">
+      <div class="metric"><b>${p.locales_afectados.toLocaleString('es-PE')}</b><span>Locales afectados ≤100m</span></div>
+      <div class="metric"><b>${(p.alumnos_expuestos + p.docentes_expuestos).toLocaleString('es-PE')}</b><span>Alumnos + docentes</span></div>
+    </div>
+    <p class="note">*Víctimas estimadas = denuncias × factor de subregistro Lima+Callao (referencial).
+    IBC calculado solo entre distritos con muestra ENAPRES suficiente (n≥80).</p>
+  `;
+  panel.classList.add('open');
+  if (chart) chart.destroy();
+  const ctx = document.getElementById('panel-chart');
+  chart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Denuncias','Desconfianza'],
+      datasets:[{
+        data:[p.pct_denuncias, p.pct_desconfianza],
+        backgroundColor:['#3B82F6','#F0A24B'],
+        borderRadius:4, maxBarThickness:56,
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>c.parsed.y.toFixed(0)+'° percentil'}}},
+      scales:{
+        y:{min:0,max:100, ticks:{color:'#8FA3C8',font:{family:'IBM Plex Mono',size:10}}, grid:{color:'rgba(255,255,255,.06)'}},
+        x:{ticks:{color:'#E7ECF5',font:{family:'Public Sans',size:12,weight:600}}, grid:{display:false}},
+      }
+    }
+  });
+}
+function closePanel() { document.getElementById('panel').classList.remove('open'); }
+</script>
+</body>
+</html>
